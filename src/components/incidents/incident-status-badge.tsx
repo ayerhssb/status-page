@@ -1,0 +1,36 @@
+// src/components/incidents/incident-status-badge.tsx
+import { Badge } from "@/components/ui/badge";
+import { IncidentStatus } from "@prisma/client";
+
+interface IncidentStatusBadgeProps {
+  status: IncidentStatus;
+}
+
+const statusConfig = {
+  INVESTIGATING: {
+    label: "Investigating",
+    variant: "destructive" as const,
+  },
+  IDENTIFIED: {
+    label: "Identified",
+    variant: "warning" as const,
+  },
+  MONITORING: {
+    label: "Monitoring",
+    variant: "secondary" as const,
+  },
+  RESOLVED: {
+    label: "Resolved",
+    variant: "outline" as const,
+  },
+};
+
+export function IncidentStatusBadge({ status }: IncidentStatusBadgeProps) {
+  const config = statusConfig[status];
+  
+  return (
+    <Badge variant={config.variant}>
+      {config.label}
+    </Badge>
+  );
+}
