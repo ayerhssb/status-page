@@ -1,7 +1,7 @@
 // src/app/api/organizations/[organizationId]/incidents/[incidentId]/route.ts
 import { prisma } from "@/lib/prisma";
-import { pusherServer } from "@/lib/pusher";
-import { auth } from "@clerk/nextjs";
+import { pusher } from "@/lib/pusher";
+import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
@@ -9,7 +9,7 @@ export async function GET(
   { params }: { params: { organizationId: string; incidentId: string } }
 ) {
   try {
-    const { userId, orgId } = auth();
+    const { userId, orgId } = await auth();
 
     if (!userId || orgId !== params.organizationId) {
       return new NextResponse("Unauthorized", { status: 401 });
@@ -46,7 +46,7 @@ export async function PATCH(
   { params }: { params: { organizationId: string; incidentId: string } }
 ) {
   try {
-    const { userId, orgId } = auth();
+    const { userId, orgId } = await auth();
 
     if (!userId || orgId !== params.organizationId) {
       return new NextResponse("Unauthorized", { status: 401 });
@@ -137,7 +137,7 @@ export async function PATCH(
     });
 
     // Trigger real-time update
-    await pusherServer.trigger(
+    await pusher.trigger(
       `organization-${params.organizationId}`,
       "incident-updated",
       {
@@ -160,7 +160,7 @@ export async function DELETE(
   { params }: { params: { organizationId: string; incidentId: string } }
 ) {
   try {
-    const { userId, orgId } = auth();
+    const { userId, orgId } = await auth();
 
     if (!userId || orgId !== params.organizationId) {
       return new NextResponse("Unauthorized", { status: 401 });
@@ -212,7 +212,7 @@ export async function DELETE(
     }
 
     // Trigger real-time update
-    await pusherServer.trigger(
+    await pusher.trigger(
       `organization-${params.organizationId}`,
       "incident-deleted",
       {

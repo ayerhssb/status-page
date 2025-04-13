@@ -1,7 +1,7 @@
 // src/app/dashboard/[organizationId]/incidents/new/page.tsx
 import { IncidentForm } from "@/components/incidents/incident-form";
 import { prisma } from "@/lib/prisma";
-import { auth } from "@clerk/nextjs";
+import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 
 interface NewIncidentPageProps {
@@ -13,7 +13,7 @@ interface NewIncidentPageProps {
 export default async function NewIncidentPage({
   params,
 }: NewIncidentPageProps) {
-  const { userId, orgId } = auth();
+  const { userId, orgId } = await auth(); // ✅ FIXED
 
   if (!userId || orgId !== params.organizationId) {
     redirect("/");

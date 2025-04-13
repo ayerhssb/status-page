@@ -1,20 +1,21 @@
-// src/app/(dashboard)/dashboard/page.tsx
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { auth, currentOrganization } from "@clerk/nextjs/server";
+import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 
 export default async function DashboardPage() {
-  const { userId } = auth();
-  const organization = await currentOrganization();
-  
-  if (!userId) {
+  const { userId, orgId } = await auth();
+
+  if (!userId || !orgId) {
     redirect("/sign-in");
   }
 
-  // If no organization exists, show a message
+  const organization = await prisma.organization.findUnique({
+    where: { id: orgId },
+  });
+
   if (!organization) {
     return (
       <div className="flex flex-col items-center justify-center h-[calc(100vh-10rem)]">
@@ -31,20 +32,13 @@ export default async function DashboardPage() {
     );
   }
 
-  // Get statistics
-  const servicesCount = await prisma.service.count({ 
-    where: { organizationId: organization.id } 
-  });
-  
-  const incidentsCount = await prisma.incident.count({ 
-    where: { organizationId: organization.id } 
-  });
-  
-  const openIncidentsCount = await prisma.incident.count({ 
-    where: { 
+  const servicesCount = await prisma.service.count({ where: { organizationId: organization.id } });
+  const incidentsCount = await prisma.incident.count({ where: { organizationId: organization.id } });
+  const openIncidentsCount = await prisma.incident.count({
+    where: {
       organizationId: organization.id,
-      status: { notIn: ['RESOLVED'] }
-    } 
+      status: { notIn: ['RESOLVED'] },
+    },
   });
 
   return (
@@ -52,7 +46,7 @@ export default async function DashboardPage() {
       <div className="flex items-center justify-between">
         <h2 className="text-3xl font-bold tracking-tight">{organization.name} Dashboard</h2>
       </div>
-      
+
       <div className="grid gap-4 md:grid-cols-3">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -60,9 +54,7 @@ export default async function DashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{servicesCount}</div>
-            <p className="text-xs text-muted-foreground">
-              Total services being tracked
-            </p>
+            <p className="text-xs text-muted-foreground">Total services being tracked</p>
           </CardContent>
         </Card>
         <Card>
@@ -71,9 +63,7 @@ export default async function DashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{incidentsCount}</div>
-            <p className="text-xs text-muted-foreground">
-              All-time incidents recorded
-            </p>
+            <p className="text-xs text-muted-foreground">All-time incidents recorded</p>
           </CardContent>
         </Card>
         <Card>
@@ -82,9 +72,7 @@ export default async function DashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{openIncidentsCount}</div>
-            <p className="text-xs text-muted-foreground">
-              Currently active incidents
-            </p>
+            <p className="text-xs text-muted-foreground">Currently active incidents</p>
           </CardContent>
         </Card>
       </div>
@@ -104,7 +92,7 @@ export default async function DashboardPage() {
             </Button>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardHeader>
             <CardTitle>Public Status Page</CardTitle>

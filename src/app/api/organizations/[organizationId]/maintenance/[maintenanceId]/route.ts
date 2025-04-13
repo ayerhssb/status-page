@@ -1,5 +1,5 @@
 // src/app/api/organizations/[organizationId]/maintenance/[maintenanceId]/route.ts
-import { currentUser } from "@clerk/nextjs";
+import { currentUser } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { pusher } from "@/lib/pusher";

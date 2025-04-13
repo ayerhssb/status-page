@@ -10,39 +10,71 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Organization {
+  id          String                 @id @default(cuid())
+  name        String
+  services    Service[]
+  incidents   Incident[]
+  maintenance ScheduledMaintenance[]
+}
 
 model Service {
-  id              String           @id @default(cuid())
-  name            String
-  description     String?
-  status          ServiceStatus    @default(OPERATIONAL)
-  createdAt       DateTime         @default(now())
-  updatedAt       DateTime         @updatedAt
-  organizationId  String
-  incidents       Incident[]       // Relation to incidents
-  maintenances    Maintenance[]    // Relation to scheduled maintenances
+  id             String                 @id @default(cuid())
+  name           String
+  status         ServiceStatus
+  organization   Organization           @relation(fields: [organizationId], references: [id])
+  organizationId String
+  incidents      Incident[]
+  maintenance    ScheduledMaintenance[]
+}
+
+model ScheduledMaintenance {
+  id             String            @id @default(cuid())
+  title          String
+  description    String
+  status         MaintenanceStatus
+  startTime      DateTime
+  endTime        DateTime
+  service        Service           @relation(fields: [serviceId], references: [id])
+  serviceId      String
+  organization   Organization      @relation(fields: [organizationId], references: [id])
+  organizationId String
+}
+
+enum MaintenanceStatus {
+  SCHEDULED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
 }
 
 enum ServiceStatus {
   OPERATIONAL
-  DEGRADED_PERFORMANCE
-  PARTIAL_OUTAGE
-  MAJOR_OUTAGE
+  DEGRADED
+  OUTAGE
 }
 
 model Incident {
-  id              String           @id @default(cuid())
-  title           String
-  description     String
-  status          IncidentStatus   @default(INVESTIGATING)
-  impact          IncidentImpact   @default(MINOR)
-  createdAt       DateTime         @default(now())
-  updatedAt       DateTime         @updatedAt
-  resolvedAt      DateTime?
-  organizationId  String
-  serviceId       String
-  service         Service          @relation(fields: [serviceId], references: [id], onDelete: Cascade)
-  updates         IncidentUpdate[]
+  id             String           @id @default(cuid())
+  title          String
+  description    String
+  status         IncidentStatus
+  impact         String
+  createdAt      DateTime         @default(now())
+  service        Service          @relation(fields: [serviceId], references: [id])
+  serviceId      String
+  organization   Organization     @relation(fields: [organizationId], references: [id])
+  organizationId String
+  updates        IncidentUpdate[]
+}
+
+model IncidentUpdate {
+  id         String         @id @default(cuid())
+  message    String
+  status     IncidentStatus
+  createdAt  DateTime       @default(now())
+  incident   Incident       @relation(fields: [incidentId], references: [id])
+  incidentId String
 }
 
 enum IncidentStatus {
@@ -50,49 +82,4 @@ enum IncidentStatus {
   IDENTIFIED
   MONITORING
   RESOLVED
-}
-
-enum IncidentImpact {
-  MINOR
-  MAJOR
-  CRITICAL
-}
-
-model IncidentUpdate {
-  id              String           @id @default(cuid())
-  message         String
-  status          IncidentStatus
-  createdAt       DateTime         @default(now())
-  incidentId      String
-  incident        Incident         @relation(fields: [incidentId], references: [id], onDelete: Cascade)
-}
-
-model Maintenance {
-  id              String            @id @default(cuid())
-  title           String
-  description     String
-  status          MaintenanceStatus @default(SCHEDULED)
-  startTime       DateTime
-  endTime         DateTime
-  createdAt       DateTime          @default(now())
-  updatedAt       DateTime          @updatedAt
-  organizationId  String
-  serviceId       String
-  service         Service           @relation(fields: [serviceId], references: [id], onDelete: Cascade)
-  updates         MaintenanceUpdate[]
-}
-
-enum MaintenanceStatus {
-  SCHEDULED
-  IN_PROGRESS
-  COMPLETED
-}
-
-model MaintenanceUpdate {
-  id              String           @id @default(cuid())
-  message         String
-  status          MaintenanceStatus
-  createdAt       DateTime         @default(now())
-  maintenanceId   String
-  maintenance     Maintenance      @relation(fields: [maintenanceId], references: [id], onDelete: Cascade)
 }
