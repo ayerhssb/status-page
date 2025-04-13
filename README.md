@@ -6,7 +6,7 @@ Status Page is a modern, multi-tenant monitoring dashboard that allows teams to 
 
 ## 🧭 Screenshots
 
-| Dashboard with Services | Empty Org Dashboard |
+| Dashboard with Services | Dashboard |
 |--------------------------|----------------------|
 | ![Services](./public/screenshots/screenshot-1.png) | ![Empty Org](./public/screenshots/screenshot-2.png) |
 
