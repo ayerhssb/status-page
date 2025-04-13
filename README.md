@@ -1,36 +1,115 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Status Page
 
-## Getting Started
+Status Page is a modern, multi-tenant monitoring dashboard that allows teams to track the operational status of their services, incidents, and maintenance events in real-time. Built with Next.js App Router, it features Clerk authentication, organization-based access, and a beautifully minimal UI with Tailwind CSS.
 
-First, run the development server:
+---
+
+## 🧭 Screenshots
+
+| Dashboard with Services | Empty Org Dashboard |
+|--------------------------|----------------------|
+| ![Services](./public/screenshots/screenshot-1.png) | ![Empty Org](./public/screenshots/screenshot-2.png) |
+
+| Clerk Profile Dropdown | Clerk Sign-In Page |
+|------------------------|--------------------|
+| ![Clerk Dropdown](./public/screenshots/screenshot-3.png) | ![Sign In](./public/screenshots/screenshot-4.png) |
+
+---
+
+## 🛠 Tech Stack
+
+- **Next.js 14 (App Router)**
+- **React**
+- **Tailwind CSS**
+- **Prisma ORM**
+- **PostgreSQL**
+- **Clerk (Auth & Organizations)**
+
+---
+
+## ⚙️ Setup Instructions
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/your-username/status-page.git
+cd status-page
+```
+
+### 2. Install dependencies
+
+```bash
+npm install
+```
+
+### 3. Configure environment variables
+
+Create a `.env` file in the root of the project with the following:
+
+```env
+# Database
+DATABASE_URL=postgresql://USER:PASSWORD@HOST:PORT/DATABASE
+
+# Clerk Authentication
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=your_clerk_publishable_key
+CLERK_SECRET_KEY=your_clerk_secret_key
+
+NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
+NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
+NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL=/dashboard
+NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL=/dashboard
+```
+
+### 4. Setup the database
+
+```bash
+npx prisma generate
+npx prisma migrate dev --name init
+```
+
+---
+
+## 🚀 Run the App
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Your app will be running at [http://localhost:3000](http://localhost:3000)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🔐 Auth & Orgs
 
-## Learn More
+This app uses **Clerk** to support:
+- Email/password & OAuth login
+- Multi-organization access
+- Role-based navigation for services/incidents
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 📁 Folder Structure (Simplified)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```
+src/
+  app/
+    (dashboard)/
+      incidents/
+      services/
+      maintenance/
+  components/
+  lib/
+  prisma/
+```
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 📄 License
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+MIT
+
+---
+
+## 💬 Contributions
+
+PRs and improvements welcome! Just open an issue first for discussion.
