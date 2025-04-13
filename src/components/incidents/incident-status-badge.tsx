@@ -1,6 +1,7 @@
-// src/components/incidents/incident-status-badge.tsx
 import { Badge } from "@/components/ui/badge";
 import { IncidentStatus } from "@prisma/client";
+
+export type { IncidentStatus }; // 👈 EXPORT HERE
 
 interface IncidentStatusBadgeProps {
   status: IncidentStatus;
@@ -27,10 +28,6 @@ const statusConfig = {
 
 export function IncidentStatusBadge({ status }: IncidentStatusBadgeProps) {
   const config = statusConfig[status];
-  
-  return (
-    <Badge variant={config.variant}>
-      {config.label}
-    </Badge>
-  );
+
+  return <Badge variant={config.variant}>{config.label}</Badge>;
 }

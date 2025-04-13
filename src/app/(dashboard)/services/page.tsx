@@ -1,88 +1,100 @@
-// src/app/(dashboard)/services/page.tsx
+"use client"
+
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from "next/link";
-import { prisma } from "@/lib/prisma";
-import { auth } from "@clerk/nextjs/server";
-import { redirect } from "next/navigation";
-import ServiceStatusBadge from "@/components/services/service-status-badge";
+import { CheckCircle, AlertTriangle, AlertCircle, XCircle, Plus } from "lucide-react";
+
+// 1. Define valid service status types
+type ServiceStatus = 'operational' | 'degraded' | 'partial_outage' | 'major_outage';
+
+// 2. Define the structure of a service
+interface Service {
+  id: string;
+  name: string;
+  status: ServiceStatus;
+}
 
 export default async function ServicesPage() {
-  const {orgId} = await auth();
-  
-  if (!orgId) {
-    redirect("/dashboard");
-  }
+  // Dummy data — typically this comes from a DB/API
+  const services: Service[] = [
+    { id: '1', name: 'Website', status: 'operational' },
+    { id: '2', name: 'API', status: 'degraded' },
+    { id: '3', name: 'Database', status: 'operational' },
+    { id: '4', name: 'Authentication', status: 'operational' },
+  ];
 
-  const services = await prisma.service.findMany({
-    where: { organizationId: orgId },
-    orderBy: { createdAt: 'desc' }
-  });
+  const getStatusIcon = (status: ServiceStatus) => {
+    switch (status) {
+      case 'operational':
+        return <CheckCircle className="h-5 w-5 text-green-500" />;
+      case 'degraded':
+        return <AlertTriangle className="h-5 w-5 text-yellow-500" />;
+      case 'partial_outage':
+        return <AlertCircle className="h-5 w-5 text-orange-500" />;
+      case 'major_outage':
+        return <XCircle className="h-5 w-5 text-red-500" />;
+      default:
+        return null;
+    }
+  };
+
+  const getStatusText = (status: ServiceStatus) => {
+    switch (status) {
+      case 'operational':
+        return "Operational";
+      case 'degraded':
+        return "Degraded Performance";
+      case 'partial_outage':
+        return "Partial Outage";
+      case 'major_outage':
+        return "Major Outage";
+      default:
+        return "Unknown";
+    }
+  };
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-3xl font-bold tracking-tight">Services</h2>
-        <Button asChild>
-          <Link href="/services/new">Add Service</Link>
-        </Button>
+    <div className="p-6">
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-3xl font-bold">Services</h1>
+        <Link href="/dashboard/services/new">
+          <Button>
+            <Plus className="mr-2 h-4 w-4" />
+            Add Service
+          </Button>
+        </Link>
       </div>
 
-      {services.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-12 border rounded-lg border-dashed">
-          <h3 className="mb-2 text-lg font-medium">No services added yet</h3>
-          <p className="mb-4 text-sm text-gray-500">Add your first service to start monitoring</p>
-          <Button asChild>
-            <Link href="/services/new">Add Your First Service</Link>
-          </Button>
-        </div>
-      ) : (
-        <div className="overflow-hidden border rounded-lg">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
-                  Name
-                </th>
-                <th className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
-                  Status
-                </th>
-                <th className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
-                  Created
-                </th>
-                <th className="px-6 py-3 text-xs font-medium tracking-wider text-right text-gray-500 uppercase">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {services.map((service) => (
-                <tr key={service.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap">
+      <Card>
+        <CardHeader>
+          <CardTitle>Manage Services</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {services.length > 0 ? (
+              services.map((service) => (
+                <div
+                  key={service.id}
+                  className="flex justify-between items-center p-3 border-b last:border-0 hover:bg-gray-50"
+                >
+                  <Link href={`/dashboard/services/${service.id}`} className="flex-1">
                     <div className="font-medium">{service.name}</div>
-                    {service.description && (
-                      <div className="text-sm text-gray-500">{service.description}</div>
-                    )}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <ServiceStatusBadge status={service.currentStatus} />
-                  </td>
-                  <td className="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">
-                    {new Date(service.createdAt).toLocaleDateString()}
-                  </td>
-                  <td className="px-6 py-4 text-sm font-medium text-right whitespace-nowrap">
-                    <Link 
-                      href={`/services/${service.id}`}
-                      className="text-blue-600 hover:text-blue-800"
-                    >
-                      Edit
-                    </Link>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+                  </Link>
+                  <div className="flex items-center gap-2">
+                    {getStatusIcon(service.status)}
+                    <span>{getStatusText(service.status)}</span>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="text-center py-4">
+                <p className="text-gray-500">No services found. Create your first service.</p>
+              </div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }

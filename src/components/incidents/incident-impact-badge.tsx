@@ -1,6 +1,7 @@
-// src/components/incidents/incident-impact-badge.tsx
 import { Badge } from "@/components/ui/badge";
 import { IncidentImpact } from "@prisma/client";
+
+export type { IncidentImpact }; // 👈 EXPORT HERE
 
 interface IncidentImpactBadgeProps {
   impact: IncidentImpact;
@@ -23,10 +24,6 @@ const impactConfig = {
 
 export function IncidentImpactBadge({ impact }: IncidentImpactBadgeProps) {
   const config = impactConfig[impact];
-  
-  return (
-    <Badge variant={config.variant}>
-      {config.label}
-    </Badge>
-  );
+
+  return <Badge variant={config.variant}>{config.label}</Badge>;
 }

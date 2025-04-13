@@ -1,4 +1,5 @@
 // src/components/incidents/incident-form.tsx
+"use client";
 import { Button } from "@/components/ui/button";
 import {
   Form,

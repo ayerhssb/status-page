@@ -1,3 +1,4 @@
+"use client";
 // src/components/incidents/incident-update-list.tsx
 import { IncidentStatusBadge } from "@/components/incidents/incident-status-badge";
 import { Button } from "@/components/ui/button";

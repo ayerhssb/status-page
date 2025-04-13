@@ -1,23 +1,20 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { getAuth, auth } from "@clerk/nextjs/server";
+import { auth, getAuth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 
 export default async function DashboardPage() {
-  const { userId } = await auth();
-  console.log(getAuth());
+  const { userId } =  await auth(); // ✅ fix: use getAuth to get orgId
+  console.log(userId)
 
-  console.log(orgId);
-  console.log(userId);
-
-  if (!userId || !orgId) {
+  if (!userId) {
     redirect("/sign-in");
   }
 
   const organization = await prisma.organization.findUnique({
-    where: { id: orgId },
+    where: { id: userId },
   });
 
   if (!organization) {
