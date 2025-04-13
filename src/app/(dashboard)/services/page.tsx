@@ -2,19 +2,19 @@
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
-import { currentOrganization } from "@clerk/nextjs/server";
+import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import ServiceStatusBadge from "@/components/services/service-status-badge";
 
 export default async function ServicesPage() {
-  const organization = await currentOrganization();
+  const {orgId} = await auth();
   
-  if (!organization) {
+  if (!orgId) {
     redirect("/dashboard");
   }
 
   const services = await prisma.service.findMany({
-    where: { organizationId: organization.id },
+    where: { organizationId: orgId },
     orderBy: { createdAt: 'desc' }
   });
 

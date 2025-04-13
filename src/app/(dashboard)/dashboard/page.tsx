@@ -1,12 +1,16 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { auth } from "@clerk/nextjs/server";
+import { getAuth, auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 
 export default async function DashboardPage() {
-  const { userId, orgId } = await auth();
+  const { userId } = await auth();
+  console.log(getAuth());
+
+  console.log(orgId);
+  console.log(userId);
 
   if (!userId || !orgId) {
     redirect("/sign-in");
