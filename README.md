@@ -103,13 +103,3 @@ src/
 ```
 
 ---
-
-## 📄 License
-
-MIT
-
----
-
-## 💬 Contributions
-
-PRs and improvements welcome! Just open an issue first for discussion.
